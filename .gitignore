@@ -1,0 +1,14 @@
+venv/
+
+.vscode
+*.pyc
+*__pycache__*
+.pytest_cache
+.env
+*.log
+
+exports/
+user/
+volumes/
+
+Grafana/

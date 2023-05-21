@@ -1,0 +1,10 @@
+# comment
+volumes
+venv
+Notes
+.vscode
+.pytest_cache
+__pycache__
+.gitignore
+*.log
+Jenkinsfile
