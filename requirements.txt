@@ -1,5 +1,5 @@
 # Postgres connection
-# psycopg2-binary==2.8.5  
+psycopg2-binary==2.8.5  
 # Alembic/SQLAlchemy stuff
 SQLAlchemy==1.4.20 
 alembic==1.6.5  

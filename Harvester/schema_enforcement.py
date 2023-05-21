@@ -122,8 +122,8 @@ class AlphaVantageStockTimeSeriesSchema(Schema, AlphaVantageTimeSeriesSchema):
 
     @pre_load
     def data_cleanup(self, in_data, many, **kwargs):
-        # if not datetime_regex.match(in_data['datetime']):
-        #     in_data['datetime'] = f"{in_data['datetime']}T16:00:00.000000"
+        if not datetime_regex.match(in_data['datetime']):
+            in_data['datetime'] = f"{in_data['datetime']}T16:00:00.000000"
         return {safename(k): v for k, v in in_data.items()}
 
     symbol = fields.String(attribute='symbol')
@@ -143,8 +143,8 @@ class AlphaVantageUSDCryptoTimeSeriesSchema(Schema, AlphaVantageTimeSeriesSchema
 
     @pre_load
     def data_cleanup(self, in_data, many, **kwargs):
-        # in_data['datetime'] = f"{in_data['datetime']}T16:00:00.000000"  # TODO: make a conditional for appropriate intraday handling
-        # TODO: ALSO figure out correct close for crypto
+        if not datetime_regex.match(in_data['datetime']):
+            in_data['datetime'] = f"{in_data['datetime']}T16:00:00.000000"
         return {safename(k): v for k, v in in_data.items()}
 
     symbol = fields.String(attribute='symbol')
