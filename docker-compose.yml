@@ -25,6 +25,9 @@ services:
 
   ingestor-stocks:
     image: kingak/ingestor-k8s-poc
+    build:
+      context: .
+      dockerfile: .docker/harvester.dockerfile
     restart: always
     depends_on:
       - kafka
@@ -47,6 +50,7 @@ services:
       - "zookeeper_data:/bitnami"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
+
   kafka:
     image: docker.io/bitnami/kafka:3.2
     ports:
