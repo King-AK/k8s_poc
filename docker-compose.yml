@@ -27,13 +27,14 @@ services:
     image: kingak/ingestor-k8s-poc
     build:
       context: .
-      dockerfile: .docker/harvester.dockerfile
+      dockerfile: .docker/ingestor.dockerfile
     restart: always
     depends_on:
       - kafka
       - db
     environment:
-      DATABASE_URI: "postgresql+psycopg2://${MAT_DATABASE_USER:-mat_admin}:${POSTGRES_PASSWORD:-passwd}@db/${MAT_DATABASE_NAME:-mat}"
+      DATABASE_URI: "postgresql+psycopg2://mat_admin:passwd@db/mat" # TODO: update URI string to use env vars
+      #     DATABASE_URI: "postgresql+psycopg2://${MAT_DATABASE_USER:-mat_admin}:${POSTGRES_PASSWORD:-passwd}@db/${MAT_DATABASE_NAME:-mat}"
       KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
     command:
       - /bin/bash
@@ -66,6 +67,8 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
       - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
       - ALLOW_PLAINTEXT_LISTENER=yes
+      - BITNAMI_DEBUG=TRUE
+      - KAFKA_ENABLE_KRAFT=no
     depends_on:
       - zookeeper
 
@@ -89,8 +92,8 @@ services:
     volumes:
       - .:/code/
     environment:
-      # DATABASE_URI: "postgresql+psycopg2://mat_admin:passwd@db/mat" # TODO: update URI string to use env vars
-      DATABASE_URI: "postgresql+psycopg2://${POSTGRES_USER:-mat_admin}:${POSTGRES_PASSWORD:-passwd}@${POSTGRES_HOSTNAME:-localhost}/${POSTGRES_DB:-mat}"
+      DATABASE_URI: "postgresql+psycopg2://mat_admin:passwd@db/mat" # TODO: update URI string to use env vars
+      # DATABASE_URI: "postgresql+psycopg2://${POSTGRES_USER:-mat_admin}:${POSTGRES_PASSWORD:-passwd}@${POSTGRES_HOSTNAME:-localhost}/${POSTGRES_DB:-mat}"
     command:
       - /bin/bash
       - -c
@@ -104,8 +107,7 @@ services:
 
 volumes:
   postgresql-data:
-    external:
-      name: ${POSTGRES_DATA_VOLUME_NAME}
+    driver: local
   zookeeper_data:
     driver: local
   kafka_data:
