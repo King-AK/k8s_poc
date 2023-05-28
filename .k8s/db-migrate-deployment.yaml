@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out .k8s/
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: db-migrate
+  name: db-migrate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: db-migrate
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out .k8s/
+        kompose.version: 1.28.0 (c4137012e)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/k8s-poc-default: "true"
+        io.kompose.service: db-migrate
+    spec:
+      containers:
+        - args:
+            - /bin/bash
+            - -c
+            - |
+              cd /code
+              pip install --upgrade pip
+              pip install wheel
+              pip install -r requirements.txt --quiet
+              cd alembic
+              alembic upgrade head
+          env:
+            - name: DATABASE_URI
+              value: postgresql+psycopg2://mat_admin:passwd@db/mat
+          image: python:3.7.3
+          name: db-migrate
+          resources: {}
+          volumeMounts:
+            - mountPath: /code
+              name: db-migrate-claim0
+      restartPolicy: Always
+      volumes:
+        - name: db-migrate-claim0
+          persistentVolumeClaim:
+            claimName: db-migrate-claim0
+status: {}

@@ -20,6 +20,15 @@ This is a lightweight repo with a microservices architecture that collects stock
 docker compose build
 ```
 
+### Run Container Structure Tests
+
+```bash
+container-structure-test test --image kingak/harvester-k8s-poc --config tests/container-structure-tests/harvester-file-existence-tests.yaml
+container-structure-test test --image kingak/harvester-k8s-poc --config tests/container-structure-tests/harvester-metadata-test.yaml
+container-structure-test test --image kingak/ingestor-k8s-poc --config tests/container-structure-tests/ingestor-file-existence-tests.yaml
+container-structure-test test --image kingak/ingestor-k8s-poc --config tests/container-structure-tests/ingestor-metadata-test.yaml
+```
+
 ### Run with Compose
 
 ```bash

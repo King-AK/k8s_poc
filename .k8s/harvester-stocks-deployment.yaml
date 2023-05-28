@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out .k8s/
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: harvester-stocks
+  name: harvester-stocks
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: harvester-stocks
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out .k8s/
+        kompose.version: 1.28.0 (c4137012e)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/k8s-poc-default: "true"
+        io.kompose.service: harvester-stocks
+    spec:
+      containers:
+        - args:
+            - /bin/bash
+            - -c
+            - |
+              python harvester.py -t $(){MAT_STOCK_TICKER_LIST}
+          env:
+            - name: ALPHAVANTAGE_API_KEY
+              value: ${ALPHAVANTAGE_API_KEY}
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+            - name: MAT_STOCK_TICKER_LIST
+              value: ${MAT_STOCK_TICKER_LIST}
+          image: kingak/harvester-k8s-poc
+          imagePullPolicy: Never
+          name: harvester-stocks
+          resources: {}
+      restartPolicy: Always
+status: {}
