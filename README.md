@@ -37,6 +37,10 @@ docker compose up
 
 ### Run with K8s
 
+```bash
+kubectl apply -f .k8s/
+```
+
 ## Development
 
 ### Running PyTest
