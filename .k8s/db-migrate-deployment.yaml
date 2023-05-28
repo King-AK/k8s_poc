@@ -13,8 +13,7 @@ spec:
   selector:
     matchLabels:
       io.kompose.service: db-migrate
-  strategy:
-    type: Recreate
+  strategy: {}
   template:
     metadata:
       annotations:
@@ -29,25 +28,13 @@ spec:
         - args:
             - /bin/bash
             - -c
-            - |
-              cd /code
-              pip install --upgrade pip
-              pip install wheel
-              pip install -r requirements.txt --quiet
-              cd alembic
-              alembic upgrade head
+            - "while ! nc -z db 5432; do\n  echo \"waiting for PostgreSQL to become available ...\"   \n  sleep 1\ndone\n\ncd alembic\nalembic upgrade head\n"
           env:
             - name: DATABASE_URI
               value: postgresql+psycopg2://mat_admin:passwd@db/mat
-          image: python:3.7.3
+          image: kingak/db-migrate-k8s-poc
+          imagePullPolicy: Never
           name: db-migrate
           resources: {}
-          volumeMounts:
-            - mountPath: /code
-              name: db-migrate-claim0
       restartPolicy: Always
-      volumes:
-        - name: db-migrate-claim0
-          persistentVolumeClaim:
-            claimName: db-migrate-claim0
 status: {}

@@ -86,11 +86,12 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-passwd}"
 
   db-migrate:
-    image: python:3.7.3
+    image: kingak/db-migrate-k8s-poc
+    build:
+      context: .
+      dockerfile: .docker/db-migrate.dockerfile
     depends_on:
       - db
-    volumes:
-      - .:/code/
     environment:
       DATABASE_URI: "postgresql+psycopg2://mat_admin:passwd@db/mat" # TODO: update URI string to use env vars
       # DATABASE_URI: "postgresql+psycopg2://${POSTGRES_USER:-mat_admin}:${POSTGRES_PASSWORD:-passwd}@${POSTGRES_HOSTNAME:-localhost}/${POSTGRES_DB:-mat}"
@@ -98,10 +99,11 @@ services:
       - /bin/bash
       - -c
       - |
-        cd /code
-        pip install --upgrade pip
-        pip install wheel
-        pip install -r requirements.txt --quiet
+        while ! nc -z db 5432; do
+          echo "waiting for PostgreSQL to become available ..."   
+          sleep 1
+        done
+
         cd alembic
         alembic upgrade head
 
