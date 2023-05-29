@@ -36,5 +36,4 @@ spec:
           imagePullPolicy: Never
           name: db-migrate
           resources: {}
-      restartPolicy: Always
 status: {}

@@ -28,11 +28,11 @@ spec:
       containers:
         - env:
             - name: POSTGRES_DB
-              value: ${MAT_DATABASE_NAME:-mat}
+              value: mat
             - name: POSTGRES_PASSWORD
-              value: ${POSTGRES_PASSWORD:-passwd}
+              value: passwd
             - name: POSTGRES_USER
-              value: ${MAT_DATABASE_USER:-mat_admin}
+              value: mat_admin
           image: postgres:13.3-buster
           name: db
           ports:
