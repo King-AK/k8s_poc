@@ -28,11 +28,20 @@ spec:
       containers:
         - env:
             - name: POSTGRES_DB
-              value: mat
+              valueFrom:
+                configMapKeyRef:
+                  name: mat-configs
+                  key: POSTGRES_DB
             - name: POSTGRES_PASSWORD
-              value: passwd
+              valueFrom:
+                configMapKeyRef:
+                  name: mat-configs
+                  key: POSTGRES_PASSWORD
             - name: POSTGRES_USER
-              value: mat_admin
+              valueFrom:
+                configMapKeyRef:
+                  name: mat-configs
+                  key: POSTGRES_USER
           image: postgres:13.3-buster
           name: db
           ports:

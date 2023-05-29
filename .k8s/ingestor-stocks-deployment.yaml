@@ -32,9 +32,15 @@ spec:
               python ingestor.py -t stock
           env:
             - name: DATABASE_URI
-              value: postgresql+psycopg2://mat_admin:passwd@db/mat
+              valueFrom:
+                configMapKeyRef:
+                  name: mat-configs
+                  key: DATABASE_URI
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: kafka:9092
+              valueFrom:
+                configMapKeyRef:
+                  name: mat-configs
+                  key: KAFKA_BOOTSTRAP_SERVERS
           image: kingak/ingestor-k8s-poc
           imagePullPolicy: Never
           name: ingestor-stocks

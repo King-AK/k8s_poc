@@ -31,7 +31,10 @@ spec:
             - "while ! nc -z db 5432; do\n  echo \"waiting for PostgreSQL to become available ...\"   \n  sleep 1\ndone\n\ncd alembic\nalembic upgrade head\n"
           env:
             - name: DATABASE_URI
-              value: postgresql+psycopg2://mat_admin:passwd@db/mat
+              valueFrom:
+                configMapKeyRef:
+                  name: mat-configs
+                  key: DATABASE_URI
           image: kingak/db-migrate-k8s-poc
           imagePullPolicy: Never
           name: db-migrate

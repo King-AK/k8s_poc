@@ -29,14 +29,23 @@ spec:
             - /bin/bash
             - -c
             - |
-              python harvester.py -t $(){MAT_STOCK_TICKER_LIST}
+              python harvester.py -t ${MAT_STOCK_TICKER_LIST}
           env:
             - name: ALPHAVANTAGE_API_KEY
-              value: ${ALPHAVANTAGE_API_KEY}
+              valueFrom:
+                configMapKeyRef:
+                  name: mat-configs
+                  key: ALPHAVANTAGE_API_KEY
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: kafka:9092
+              valueFrom:
+                configMapKeyRef:
+                  name: mat-configs
+                  key: KAFKA_BOOTSTRAP_SERVERS
             - name: MAT_STOCK_TICKER_LIST
-              value: ${MAT_STOCK_TICKER_LIST}
+              valueFrom:
+                configMapKeyRef:
+                  name: mat-configs
+                  key: MAT_STOCK_TICKER_LIST
           image: kingak/harvester-k8s-poc
           imagePullPolicy: Never
           name: harvester-stocks

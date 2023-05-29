@@ -1,0 +1,12 @@
+# Sample ConfigMap File, to actually be used vals would need to be populated
+apiVersion: v1
+data:
+  ALPHAVANTAGE_API_KEY: "INSERT API KEY HERE"
+  POSTGRES_DB: mat
+  POSTGRES_PASSWORD: passwd
+  POSTGRES_USER: mat_admin
+  DATABASE_URI: "postgresql+psycopg2://mat_admin:passwd@db/mat"
+  KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+  MAT_STOCK_TICKER_LIST: "VZ T F"
+  MODEL_ENV: "flask_db.config.PostgresConfig"
+kind: ConfigMap

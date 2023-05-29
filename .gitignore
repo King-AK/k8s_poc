@@ -1,6 +1,7 @@
 venv/
 
 .vscode
+.k8s-configs
 *.pyc
 *__pycache__*
 .pytest_cache
