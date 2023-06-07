@@ -2,7 +2,7 @@
 
 Dummy repo to play around with k8s and docker.
 
-This is a lightweight repo with a microservices architecture that collects stock market data.
+This is a lightweight repo with a microservices architecture that collects market data from an API source, [AlphaVantage](https://www.alphavantage.co/), and publishes messages to a Kafka topic. A downstream subscriber consumes the messages and curates data before landing it into a relational database.
 
 ## Overview
 
@@ -11,6 +11,8 @@ This is a lightweight repo with a microservices architecture that collects stock
 - python3
 - docker
 - [docker-compose](https://docs.docker.com/compose/install/#install-compose)
+- kubernetes
+- kubectl
 
 ## How to use
 
@@ -18,15 +20,6 @@ This is a lightweight repo with a microservices architecture that collects stock
 
 ```bash
 docker compose build
-```
-
-### Run Container Structure Tests
-
-```bash
-container-structure-test test --image kingak/harvester-k8s-poc --config tests/container-structure-tests/harvester-file-existence-tests.yaml
-container-structure-test test --image kingak/harvester-k8s-poc --config tests/container-structure-tests/harvester-metadata-test.yaml
-container-structure-test test --image kingak/ingestor-k8s-poc --config tests/container-structure-tests/ingestor-file-existence-tests.yaml
-container-structure-test test --image kingak/ingestor-k8s-poc --config tests/container-structure-tests/ingestor-metadata-test.yaml
 ```
 
 ### Run with Compose
@@ -43,6 +36,45 @@ kubectl apply -f .k8s/
 
 ## Development
 
-### Running PyTest
+### Running Python Tests with PyTest
 
-### Running Container Structure Tests
+Set up and activate virtual environment
+
+```bash
+# Set up venv
+rm -rf ./venv
+python3.10 -m venv ./venv
+source ./venv/bin/activate
+```
+
+Install requirements
+
+```bash
+# Install requirements
+pip install --upgrade pip
+pip install wheel
+pip install setuptools
+pip install -r requirements.txt
+pip install -r test-requirements.txt
+```
+
+Lint Python Code
+
+```bash
+flake8
+```
+
+Run tests
+
+```bash
+pytest tests/
+```
+
+### Run Container Structure Tests
+
+```bash
+container-structure-test test --image kingak/harvester-k8s-poc --config tests/container-structure-tests/harvester-file-existence-tests.yaml
+container-structure-test test --image kingak/harvester-k8s-poc --config tests/container-structure-tests/harvester-metadata-test.yaml
+container-structure-test test --image kingak/ingestor-k8s-poc --config tests/container-structure-tests/ingestor-file-existence-tests.yaml
+container-structure-test test --image kingak/ingestor-k8s-poc --config tests/container-structure-tests/ingestor-metadata-test.yaml
+```
