@@ -13,3 +13,5 @@ user/
 volumes/
 
 Grafana/
+
+.helm-config

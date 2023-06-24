@@ -13,6 +13,7 @@ This is a lightweight repo with a microservices architecture that collects marke
 - [docker-compose](https://docs.docker.com/compose/install/#install-compose)
 - kubernetes
 - kubectl
+- helm
 
 ## How to use
 
@@ -33,6 +34,8 @@ docker compose up
 ```bash
 kubectl apply -f .k8s/
 ```
+
+Not all services listed in the Compose file have to be translated to K8s services managed within this repo. Instead, selective use of Helm charts can help abstract certain pieces of the architecture such as PostgreSQL and Kafka. Then more focus can go to the custom code.
 
 ## Development
 
