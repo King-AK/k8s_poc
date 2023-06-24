@@ -13,5 +13,5 @@ helm install -f .helm-config/postgres-values.yml $POSTGRES_RELEASE_NAME bitnami/
 helm install -f .helm-config/kafka-values.yml $KAFKA_RELEASE_NAME bitnami/kafka --version $KAFKA_VERSION
 
 # Apply K8s files
-k apply -f .k8s-configs/
-k apply -f .k8s/
+kubectl apply -f .k8s-configs/
+kubectl apply -f .k8s/
