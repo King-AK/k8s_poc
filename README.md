@@ -32,10 +32,16 @@ docker compose up
 ### Run with K8s
 
 ```bash
-kubectl apply -f .k8s/
+bash install.sh <release-name-postgresql> <release-name-kafka>
 ```
 
 Not all services listed in the Compose file have to be translated to K8s services managed within this repo. Instead, selective use of Helm charts can help abstract certain pieces of the architecture such as PostgreSQL and Kafka. Then more focus can go to the custom code.
+
+To uninstall
+
+```bash
+bash uninstall.sh <release-name-postgresql> <release-name-kafka>
+```
 
 ## Development
 
