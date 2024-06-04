@@ -12,12 +12,12 @@ class TestAlphaVantageSchemaEnforcement(BasicUnitTest):
                            ("INTRADAY_5MIN"),
                            ])
     def test_AlphaVantageTimeSeriesSchema_clean_time_series_dictionary_list(self, test_name):
-        file_info = {"DAILY": {"test_data_path": '../test_data/alphavantage/given/market_time_series_daily.json',
+        file_info = {"DAILY": {"test_data_path": 'tests/test_data/alphavantage/given/market_time_series_daily.json',
                                "time_series_key": 'Time Series (Daily)',
-                               "expected_data_path": '../test_data/alphavantage/expected/test_AlphaVantageTimeSeriesSchema_clean_time_series_dictionary_list.json'},  # noqa:E501
-                     "INTRADAY_5MIN": {"test_data_path": '../test_data/alphavantage/given/market_time_series_intraday_5min.json',
+                               "expected_data_path": 'tests/test_data/alphavantage/expected/test_AlphaVantageTimeSeriesSchema_clean_time_series_dictionary_list.json'},  # noqa:E501
+                     "INTRADAY_5MIN": {"test_data_path": 'tests/test_data/alphavantage/given/market_time_series_intraday_5min.json',
                                        "time_series_key": 'Time Series (5min)',
-                                       "expected_data_path": '../test_data/alphavantage/expected/test_AlphaVantageTimeSeriesSchema_clean_time_series_dictionary_list_intraday_5min.json'}}  # noqa:E501
+                                       "expected_data_path": 'tests/test_data/alphavantage/expected/test_AlphaVantageTimeSeriesSchema_clean_time_series_dictionary_list_intraday_5min.json'}}  # noqa:E501
         test_data_path = file_info[test_name]['test_data_path']
         test_data = json.load(open(test_data_path, 'r'))
         time_series_key = file_info[test_name]['time_series_key']
@@ -38,21 +38,21 @@ class TestAlphaVantageSchemaEnforcement(BasicUnitTest):
                            ("INTRADAY_60MIN",  "2021-03-01 14:00:00", 100),
                            ])
     def test_load_AlphaVantageStockTimeSeriesSchema(self, test_name, single_target_date, expected_many_load_len):
-        file_info = {"DAILY": {"path": "../test_data/alphavantage/given/market_time_series_daily.json",
+        file_info = {"DAILY": {"path": "tests/test_data/alphavantage/given/market_time_series_daily.json",
                                "time_series_key": 'Time Series (Daily)'},
-                     "WEEKLY": {"path": "../test_data/alphavantage/given/market_time_series_weekly.json",
+                     "WEEKLY": {"path": "tests/test_data/alphavantage/given/market_time_series_weekly.json",
                                 "time_series_key": 'Weekly Time Series'},
-                     "MONTHLY": {"path": "../test_data/alphavantage/given/market_time_series_monthly.json",
+                     "MONTHLY": {"path": "tests/test_data/alphavantage/given/market_time_series_monthly.json",
                                  "time_series_key": 'Monthly Time Series'},
-                     "INTRADAY_1MIN": {"path": "../test_data/alphavantage/given/market_time_series_intraday_1min.json",
+                     "INTRADAY_1MIN": {"path": "tests/test_data/alphavantage/given/market_time_series_intraday_1min.json",
                                        "time_series_key": 'Time Series (1min)'},
-                     "INTRADAY_5MIN": {"path": "../test_data/alphavantage/given/market_time_series_intraday_5min.json",
+                     "INTRADAY_5MIN": {"path": "tests/test_data/alphavantage/given/market_time_series_intraday_5min.json",
                                        "time_series_key": 'Time Series (5min)'},
-                     "INTRADAY_15MIN": {"path": "../test_data/alphavantage/given/market_time_series_intraday_15min.json",
+                     "INTRADAY_15MIN": {"path": "tests/test_data/alphavantage/given/market_time_series_intraday_15min.json",
                                         "time_series_key": 'Time Series (15min)'},
-                     "INTRADAY_30MIN": {"path": "../test_data/alphavantage/given/market_time_series_intraday_30min.json",
+                     "INTRADAY_30MIN": {"path": "tests/test_data/alphavantage/given/market_time_series_intraday_30min.json",
                                         "time_series_key": 'Time Series (30min)'},
-                     "INTRADAY_60MIN": {"path": "../test_data/alphavantage/given/market_time_series_intraday_60min.json",
+                     "INTRADAY_60MIN": {"path": "tests/test_data/alphavantage/given/market_time_series_intraday_60min.json",
                                         "time_series_key": 'Time Series (60min)'}}
 
         path = file_info[test_name]['path']

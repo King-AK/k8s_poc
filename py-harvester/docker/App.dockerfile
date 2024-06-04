@@ -31,21 +31,6 @@ WORKDIR $PYSETUP_PATH
 COPY ./poetry.lock ./pyproject.toml ./
 RUN poetry install --no-dev
 
-# 'lint' stage runs black and isort
-# running in check mode means build will fail if any linting errors occur
-# FROM development AS lint
-# RUN black --config ./pyproject.toml --check app tests
-# RUN isort --settings-path ./pyproject.toml --recursive --check-only
-# CMD ["tail", "-f", "/dev/null"]
-
-
-# # 'test' stage runs our unit tests with pytest and
-# # coverage.  Build will fail if test coverage is under 95%
-# FROM development AS test
-# RUN coverage run --rcfile ./pyproject.toml -m pytest ./tests
-# # RUN coverage report --fail-under 95
-#
-
 # 'development' stage installs all dev dependencies and can be used to develop code.
 # For example using docker-compose to mount local volume under /app
 FROM python-base as development
@@ -66,6 +51,20 @@ WORKDIR /app
 COPY . .
 
 ENTRYPOINT /docker-entrypoint.sh $0 $@
+
+# 'lint' stage runs black and isort
+# running in check mode means build will fail if any linting errors occur
+# FROM development AS lint
+# RUN black --config ./pyproject.toml --check app tests
+# RUN isort --settings-path ./pyproject.toml --recursive --check-only
+# CMD ["tail", "-f", "/dev/null"]
+
+
+# # 'test' stage runs our unit tests with pytest and
+# # coverage.  Build will fail if test coverage is under 95%
+#FROM development AS test
+#RUN coverage run --rcfile ./pyproject.toml -m pytest ./tests
+# # RUN coverage report --fail-under 95
 
 # 'production' stage uses the clean 'python-base' stage and copies
 # in only our runtime deps that were installed in the 'builder-base'
