@@ -15,3 +15,6 @@ volumes/
 Grafana/
 
 .helm-config
+
+# IntelliJ
+.idea/
