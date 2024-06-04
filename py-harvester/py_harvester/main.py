@@ -26,12 +26,12 @@ def harvest_stock_data(producer: KafkaProducer, symbols: list, av: AlphaVantageA
         cleaned_data = AlphaVantageStockTimeSeriesSchema().load(cleaned_data, many=True)
         print(cleaned_data)
 
-        logger.info(f"Collected [{args.data_type}] data for ${symbol}...")
-        for data in cleaned_data:
-            producer.send("stock-time-series", value=data)
-        logger.info(f"Sent [{args.data_type}] data for ${symbol} to broker...")
-
-        producer.flush()
+        # logger.info(f"Collected [{args.data_type}] data for ${symbol}...")
+        # for data in cleaned_data:
+        #     producer.send("stock-time-series", value=data)
+        # logger.info(f"Sent [{args.data_type}] data for ${symbol} to broker...")
+        #
+        # producer.flush()
 
 
 if __name__ == '__main__':
@@ -40,6 +40,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--symbols", help="the list of symbols to get data for", type=str, required=True)
     parser.add_argument("-k", "--api_key", help="the AlphaVantage API key", type=str)
+    parser.add_argument("-b", "--kafka_bootstrap_servers", help="the Kafka bootstrap servers", type=str)
     args = parser.parse_args()
 
     api_key = args.api_key
@@ -50,7 +51,9 @@ if __name__ == '__main__':
                            .add("dry_run", False))
 
     # Establish Kafka producer
-    producer = KafkaProducer(bootstrap_servers=os.environ.get("KAFKA_BOOTSTRAP_SERVERS"),
-                             value_serializer=lambda d: json.dumps(d, default=str).encode('utf-8'))
+    # producer = KafkaProducer(bootstrap_servers=args.kafka_bootstrap_servers,
+    #                          value_serializer=lambda d: json.dumps(d, default=str).encode('utf-8'))
+    # Establish dummy producer
+    producer = None
 
     harvest_stock_data(producer, symbols, av)
