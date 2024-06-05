@@ -16,11 +16,11 @@ def build_logger(name: str, level=logging.INFO) -> logging.Logger:
     return logging.getLogger(name)
 
 
-def harvest_stock_data(producer: KafkaProducer, symbols: list, av: AlphaVantageAPI) -> None:
+def harvest_stock_data_1_min_interval(producer: KafkaProducer, symbols: list, av: AlphaVantageAPI, outputsize: str) -> None:
     for symbol in symbols:
         logger.info(f"Collecting stock data for ${symbol}...")
-        data = av.query_market_time_series_intraday(symbol)
-        time_series_key = 'Time Series (60min)'
+        data = av.query_market_time_series_intraday(symbol, interval='1min', outputsize=outputsize)
+        time_series_key = 'Time Series (1min)'
         cleaned_data = AlphaVantageStockTimeSeriesSchema.clean_time_series_dictionary_list(data[time_series_key],
                                                                                            symbol)
         cleaned_data = AlphaVantageStockTimeSeriesSchema().load(cleaned_data, many=True)
@@ -56,7 +56,11 @@ if __name__ == '__main__':
     producer = KafkaProducer(bootstrap_servers=args.kafka_bootstrap_servers,
                              value_serializer=lambda d: json.dumps(d, default=str).encode('utf-8'))
 
+    # Backfill data with full output size
+    logger.info("Starting backfill data collection...")
+    harvest_stock_data_1_min_interval(producer, symbols, av, 'full')
+
     while True:
-        harvest_stock_data(producer, symbols, av)
         logger.info(f"Sleeping for {args.sleep_interval} seconds...")
         sleep(args.sleep_interval)
+        harvest_stock_data_1_min_interval(producer, symbols, av, 'compact')
