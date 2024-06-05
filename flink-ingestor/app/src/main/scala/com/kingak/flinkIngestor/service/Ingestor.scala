@@ -1,8 +1,10 @@
 package com.kingak.flinkIngestor.service
 
+import com.kingak.flinkIngestor.schemas.{StockData, StockDataSchema}
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.flink.api.common.eventtime.WatermarkStrategy
 import org.apache.flink.api.common.serialization.SimpleStringSchema
+import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.connector.kafka.source.KafkaSource
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer
 import org.apache.flinkx.api._
@@ -31,6 +33,8 @@ object Ingestor extends LazyLogging {
     )
   }
 
+  implicit val typeInfo: Typeclass[StockData] = TypeInformation.of(classOf[StockData])
+
   def main(args: Array[String]): Unit = {
     OParser.parse(argParser, args, Config()) match {
       case Some(config) =>
@@ -43,16 +47,19 @@ object Ingestor extends LazyLogging {
           .setBootstrapServers(config.kafkaBootstrapServers)
           .setTopics(config.topic)
           .setStartingOffsets(OffsetsInitializer.earliest())
-          .setValueOnlyDeserializer(new SimpleStringSchema())
+          .setValueOnlyDeserializer(new StockDataSchema())
           .build()
-        val data = env.fromSource(
+        val data: DataStream[StockData] = env.fromSource(
           kafkaSource,
-          WatermarkStrategy.noWatermarks[String],
+          WatermarkStrategy.noWatermarks[StockData],
           "Kafka Source"
         )
 
         logger.info("Data source created")
         val result = data
+          .keyBy(_.symbol)
+          .sum("volume")
+        // TODO keyBy symbol and track running averages for price and volume
         result.print()
 
         env.execute("Ingestor")

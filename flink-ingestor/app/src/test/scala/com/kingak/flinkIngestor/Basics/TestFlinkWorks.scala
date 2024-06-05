@@ -35,8 +35,6 @@ class TestFlinkWorks extends AnyFunSuite with BeforeAndAfterEach {
 
     // verify
     assert(CollectSink.values.get(0) == 3)
-
-
   }
 
 }
