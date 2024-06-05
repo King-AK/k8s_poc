@@ -47,7 +47,6 @@ services:
       - KAFKA_ENABLE_KRAFT=no
     depends_on:
       - zookeeper
-
 volumes:
   zookeeper_data:
     driver: local

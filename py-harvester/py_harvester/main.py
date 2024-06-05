@@ -18,17 +18,17 @@ def build_logger(name: str, level=logging.INFO) -> logging.Logger:
 
 def harvest_stock_data(producer: KafkaProducer, symbols: list, av: AlphaVantageAPI) -> None:
     for symbol in symbols:
-        logger.info(f"Collecting [{args.data_type}] data for ${symbol}...")
+        logger.info(f"Collecting stock data for ${symbol}...")
         data = av.query_market_time_series_intraday(symbol)
         time_series_key = 'Time Series (60min)'
         cleaned_data = AlphaVantageStockTimeSeriesSchema.clean_time_series_dictionary_list(data[time_series_key],
                                                                                            symbol)
         cleaned_data = AlphaVantageStockTimeSeriesSchema().load(cleaned_data, many=True)
-        logger.info(f"Collected [{args.data_type}] data for ${symbol}...")
+        logger.info(f"Collected stock data for ${symbol}...")
         logger.debug(f"Data: {cleaned_data}")
         for data in cleaned_data:
             producer.send("stock-time-series", value=data)
-        logger.info(f"Sent [{args.data_type}] data for ${symbol} to broker...")
+        logger.info(f"Sent stock data for ${symbol} to broker...")
 
         producer.flush()
 
@@ -38,7 +38,7 @@ if __name__ == '__main__':
     parser.add_argument("-s", "--symbols", help="the list of symbols to get data for", type=str, required=True)
     parser.add_argument("-k", "--api_key", help="the AlphaVantage API key", type=str)
     parser.add_argument("-b", "--kafka_bootstrap_servers", help="the Kafka bootstrap servers", type=str)
-    parser.add_argument("-s", "--sleep_interval", help="the sleep interval between queries in seconds", type=int, default=300)
+    parser.add_argument("-z", "--sleep_interval", help="the sleep interval between queries in seconds", type=int, default=300)
     parser.add_argument("-l", "--log_level", help="the log level", type=str, default="INFO", choices=["DEBUG", "INFO"])
     args = parser.parse_args()
 
