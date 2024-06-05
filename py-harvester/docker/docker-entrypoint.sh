@@ -7,7 +7,7 @@ set -e
 
 # You can put other setup logic here
 poetry install
-poetry run python py_harvester/main.py "$@"
+poetry run python -m py_harvester.main "$@"
 
 ## Evaluating passed command:
 #exec "$@"
