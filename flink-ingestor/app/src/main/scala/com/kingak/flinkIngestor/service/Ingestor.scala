@@ -29,6 +29,7 @@ object Ingestor extends LazyLogging {
         .action((x, c) => c.copy(topic = x))
         .text("Kafka topic")
     )
+  }
 
   def main(args: Array[String]): Unit = {
     OParser.parse(argParser, args, Config()) match {
