@@ -16,7 +16,8 @@ def build_logger(name: str, level=logging.INFO) -> logging.Logger:
     return logging.getLogger(name)
 
 
-def harvest_stock_data_1_min_interval(producer: KafkaProducer, symbols: list, av: AlphaVantageAPI, outputsize: str) -> None:
+def harvest_stock_data_1_min_interval(producer: KafkaProducer, symbols: list, av: AlphaVantageAPI, outputsize: str,
+                                      retain_top_n: int = 0) -> None:
     for symbol in symbols:
         logger.info(f"Collecting stock data for ${symbol}...")
         data = av.query_market_time_series_intraday(symbol, interval='1min', outputsize=outputsize)
@@ -24,6 +25,8 @@ def harvest_stock_data_1_min_interval(producer: KafkaProducer, symbols: list, av
         cleaned_data = AlphaVantageStockTimeSeriesSchema.clean_time_series_dictionary_list(data[time_series_key],
                                                                                            symbol)
         cleaned_data = AlphaVantageStockTimeSeriesSchema().load(cleaned_data, many=True)
+        if retain_top_n > 0:
+            cleaned_data = sorted(cleaned_data, key=lambda x: x['datetime'], reverse=True)[:retain_top_n]
         logger.info(f"Collected stock data for ${symbol}...")
         logger.debug(f"Data: {cleaned_data}")
         for data in cleaned_data:
@@ -38,7 +41,7 @@ if __name__ == '__main__':
     parser.add_argument("-s", "--symbols", help="the list of symbols to get data for", type=str, required=True)
     parser.add_argument("-k", "--api_key", help="the AlphaVantage API key", type=str)
     parser.add_argument("-b", "--kafka_bootstrap_servers", help="the Kafka bootstrap servers", type=str)
-    parser.add_argument("-z", "--sleep_interval", help="the sleep interval between queries in seconds", type=int, default=300)
+    parser.add_argument("-z", "--sleep_interval", help="the sleep interval between queries in seconds", type=int, default=60)
     parser.add_argument("-l", "--log_level", help="the log level", type=str, default="INFO", choices=["DEBUG", "INFO"])
     args = parser.parse_args()
 
@@ -63,4 +66,5 @@ if __name__ == '__main__':
     while True:
         logger.info(f"Sleeping for {args.sleep_interval} seconds...")
         sleep(args.sleep_interval)
-        harvest_stock_data_1_min_interval(producer, symbols, av, 'compact')
+        top_n_to_retain = args.sleep_interval // 60
+        harvest_stock_data_1_min_interval(producer, symbols, av, 'compact', retain_top_n=top_n_to_retain)
