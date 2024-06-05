@@ -12,9 +12,9 @@ import scopt.{OParser, OParserBuilder}
 object Ingestor extends LazyLogging {
 
   case class Config(
-    kafkaBootstrapServers: String = "",
-    topic: String = ""
-                   )
+      kafkaBootstrapServers: String = "",
+      topic: String = ""
+  )
 
   val builder: OParserBuilder[Config] = OParser.builder[Config]
   val argParser: OParser[Unit, Config] = {
@@ -38,13 +38,18 @@ object Ingestor extends LazyLogging {
         logger.info(s"Kafka topic: ${config.topic}")
 
         val env = StreamExecutionEnvironment.getExecutionEnvironment
-        val kafkaSource = KafkaSource.builder()
+        val kafkaSource = KafkaSource
+          .builder()
           .setBootstrapServers(config.kafkaBootstrapServers)
           .setTopics(config.topic)
           .setStartingOffsets(OffsetsInitializer.earliest())
           .setValueOnlyDeserializer(new SimpleStringSchema())
           .build()
-        val data = env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks, "Kafka Source")
+        val data = env.fromSource(
+          kafkaSource,
+          WatermarkStrategy.noWatermarks[String],
+          "Kafka Source"
+        )
 
         logger.info("Data source created")
         val result = data
