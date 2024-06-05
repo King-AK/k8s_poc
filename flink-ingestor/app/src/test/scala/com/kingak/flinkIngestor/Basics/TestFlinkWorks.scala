@@ -26,7 +26,8 @@ class TestFlinkWorks extends AnyFunSuite with BeforeAndAfterEach {
     // values are collected in a static variable
     CollectSink.values.clear()
 
-    env.fromElements(2)
+    env
+      .fromElements(2)
       .map(_ + 1)
       .addSink(new CollectSink)
 

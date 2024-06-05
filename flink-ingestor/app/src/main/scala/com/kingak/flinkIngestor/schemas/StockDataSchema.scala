@@ -10,14 +10,14 @@ import org.json4s.jackson.JsonMethods._
 //import org.json4s.native.JsonMethods._
 
 case class StockData(
-                      symbol: String,
-                      datetime: java.sql.Timestamp,
-                      open: Double,
-                      high: Double,
-                      low: Double,
-                      close: Double,
-                      volume: Double
-                    )
+    symbol: String,
+    datetime: java.sql.Timestamp,
+    open: Double,
+    high: Double,
+    low: Double,
+    close: Double,
+    volume: Double
+)
 
 class StockDataSchema extends DeserializationSchema[StockData] {
 

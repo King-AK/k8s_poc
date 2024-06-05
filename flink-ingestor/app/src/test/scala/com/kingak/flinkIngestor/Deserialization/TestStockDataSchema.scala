@@ -35,4 +35,5 @@ class TestStockDataSchema extends AnyFunSuite with BeforeAndAfterEach {
     assert(data.close == 105.0)
     assert(data.volume == 1000)
   }
+
 }

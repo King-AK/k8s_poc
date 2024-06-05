@@ -33,7 +33,8 @@ object Ingestor extends LazyLogging {
     )
   }
 
-  implicit val typeInfo: Typeclass[StockData] = TypeInformation.of(classOf[StockData])
+  implicit val typeInfo: Typeclass[StockData] =
+    TypeInformation.of(classOf[StockData])
 
   def main(args: Array[String]): Unit = {
     OParser.parse(argParser, args, Config()) match {

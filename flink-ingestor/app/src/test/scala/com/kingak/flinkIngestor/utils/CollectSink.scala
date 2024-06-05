@@ -15,6 +15,6 @@ class CollectSink extends SinkFunction[Int] {
 
 object CollectSink {
   // must be static
-  val values: util.List[Int] = Collections.synchronizedList(new util.ArrayList[Int]())
+  val values: util.List[Int] =
+    Collections.synchronizedList(new util.ArrayList[Int]())
 }
-
