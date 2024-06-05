@@ -11,6 +11,12 @@ plugins {
 
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+
+    // Spotless plugin
+    id 'com.diffplug.spotless' version '6.13.0'
+
+    // Shadow Jar
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 repositories {
@@ -18,20 +24,46 @@ repositories {
     mavenCentral()
 }
 
+
+spotless {
+    scala {
+        scalafmt('3.5.9')
+    }
+}
+
+ext {
+    flinkVersion = '1.19.0'
+}
+
 dependencies {
-    // Use Scala 2.13 in our library project
-    implementation 'org.scala-lang:scala-library:2.13.11'
+    // Use Scala 2.12 in our library project
+    implementation 'org.scala-lang:scala-library:2.12.12'
+
+    // Flink related dependencies
+    implementation "org.apache.flink:flink-streaming-java:${flinkVersion}"
+    implementation "org.apache.flink:flink-clients:${flinkVersion}"
+    implementation 'org.apache.flink:flink-connector-kafka:3.1.0-1.18'
+
+    // FlinkExtended scala API
+    implementation 'org.flinkextended:flink-scala-api_2.12:1.18.1_1.1.5'
+
+    // CLI Parsing
+    implementation 'com.github.scopt:scopt_2.12:4.1.0'
+
+    // Logging
+    implementation 'com.typesafe.scala-logging:scala-logging_2.12:3.9.4'
+    implementation 'ch.qos.logback:logback-classic:1.2.10'
+
+    // Use Scalatest for testing our library
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.scalatest:scalatest_2.12:3.2.16'
+    testImplementation 'org.scalatestplus:junit-4-13_2.12:3.2.2.0'
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:32.1.1-jre'
 
-    // Use Scalatest for testing our library
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.scalatest:scalatest_2.13:3.2.16'
-    testImplementation 'org.scalatestplus:junit-4-13_2.13:3.2.2.0'
-
     // Need scala-xml at test runtime
-    testRuntimeOnly 'org.scala-lang.modules:scala-xml_2.13:1.2.0'
+    testRuntimeOnly 'org.scala-lang.modules:scala-xml_2.12:1.2.0'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -39,6 +71,22 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(8)
     }
+}
+
+version = '0.0.1'
+
+shadowJar {
+    zip64 true
+    exclude 'META-INF/*.SF'
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+    exclude 'META-INF/LICENSE'
+    exclude 'META-INF/INDEX.LIST'
+    archiveFileName = "${rootProject.name}-${version}.jar"
+}
+
+tasks.named('build').configure {
+    dependsOn 'spotlessApply'
 }
 
 application {
