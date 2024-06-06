@@ -1,6 +1,6 @@
 package com.kingak.flinkIngestor.service
 
-import com.kingak.flinkIngestor.schemas.{StockData, StockDataSchema}
+import com.kingak.flinkIngestor.schemas.StockData
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.flink.api.common.eventtime.WatermarkStrategy
 import org.apache.flink.api.common.serialization.SimpleStringSchema
@@ -48,18 +48,18 @@ object Ingestor extends LazyLogging {
           .setBootstrapServers(config.kafkaBootstrapServers)
           .setTopics(config.topic)
           .setStartingOffsets(OffsetsInitializer.earliest())
-          .setValueOnlyDeserializer(new StockDataSchema())
+          .setValueOnlyDeserializer(new SimpleStringSchema)
           .build()
-        val data: DataStream[StockData] = env.fromSource(
+        val data: DataStream[String] = env.fromSource(
           kafkaSource,
-          WatermarkStrategy.noWatermarks[StockData],
+          WatermarkStrategy.noWatermarks[String],
           "Kafka Source"
         )
-
         logger.info("Data source created")
         val result = data
-          .keyBy(_.symbol)
-          .sum("volume")
+        // TODO reintroduce JSON deserialization
+        //          .keyBy(_.symbol)
+        //          .sum("volume")
         // TODO keyBy symbol and track running averages for price and volume
         result.print()
 

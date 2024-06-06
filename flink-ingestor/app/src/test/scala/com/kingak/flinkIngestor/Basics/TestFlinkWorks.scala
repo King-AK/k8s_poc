@@ -1,6 +1,6 @@
 package com.kingak.flinkIngestor.Basics
 
-import Utils.CollectSink
+import com.kingak.flinkIngestor.utils.CollectSink
 import org.apache.flinkx.api._
 import org.apache.flinkx.api.serializers._
 import org.junit.runner.RunWith
@@ -11,9 +11,8 @@ import org.scalatestplus.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class TestFlinkWorks extends AnyFunSuite with BeforeAndAfterEach {
 
-  val env = StreamExecutionEnvironment.getExecutionEnvironment
-
   test("Flink works") {
+    val env = StreamExecutionEnvironment.getExecutionEnvironment
     assert(env != null)
   }
 

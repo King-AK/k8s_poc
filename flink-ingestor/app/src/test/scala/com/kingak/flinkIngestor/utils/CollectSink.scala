@@ -1,4 +1,4 @@
-package Utils
+package com.kingak.flinkIngestor.utils
 
 import org.apache.flink.streaming.api.functions.sink.SinkFunction
 
