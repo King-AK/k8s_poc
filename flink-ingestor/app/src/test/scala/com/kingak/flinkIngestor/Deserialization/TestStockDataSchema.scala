@@ -2,6 +2,7 @@ package com.kingak.flinkIngestor.Deserialization
 
 import com.kingak.flinkIngestor.schemas.StockData
 import com.kingak.flinkIngestor.schemas.StockDataTypeInfo._
+import com.kingak.flinkIngestor.service.Ingestor.runningAvg
 import com.kingak.flinkIngestor.utils.JSON4SSerializers.TimestampSerializer
 import com.kingak.flinkIngestor.utils.StockDataSink
 import org.apache.flinkx.api.{DataStream, StreamExecutionEnvironment}
@@ -134,17 +135,7 @@ class TestStockDataSchema extends AnyFunSuite with BeforeAndAfterEach {
     val source: DataStream[StockData] = env.fromCollection(stockDataObjects)
     val result = source
       .keyBy(_.symbol)
-      .reduce { (a, b) =>
-        StockData(
-          a.symbol,
-          a.datetime,
-          a.open,
-          a.high,
-          a.low,
-          a.close,
-          a.volume + b.volume
-        )
-      }
+      .map(runningAvg)
     result.addSink(new StockDataSink)
 
     // execute
@@ -155,14 +146,13 @@ class TestStockDataSchema extends AnyFunSuite with BeforeAndAfterEach {
     assert(sinkValues.size() == 4)
     // convert to Seq
     val sinkValuesSeq = sinkValues.toArray.toSeq.asInstanceOf[Seq[StockData]]
-    // assert max volume for AAPL is 3000
-    // group by symbol and get max volume for each symbol
-    val maxVolumes = sinkValuesSeq
-      .groupBy(_.symbol)
-      .view
-      .mapValues(_.map(_.volume).max)
-    assert(maxVolumes("AAPL") == 3000)
-    assert(maxVolumes("MSFT") == 2000)
+    // filter for most recent records, check volume averages
+    val mostRecentRecords = sinkValuesSeq.filter(
+      _.datetime == java.sql.Timestamp.valueOf("2024-06-04 19:59:00")
+    )
+    assert(mostRecentRecords.size == 2)
+    assert(mostRecentRecords.filter(_.symbol == "AAPL").head.volume == 1500)
+    assert(mostRecentRecords.filter(_.symbol == "MSFT").head.volume == 1000)
   }
 
 }

@@ -3,7 +3,9 @@ package com.kingak.flinkIngestor.service
 import com.kingak.flinkIngestor.schemas.StockData
 import com.kingak.flinkIngestor.utils.JSON4SSerializers.TimestampSerializer
 import com.typesafe.scalalogging.LazyLogging
+import org.apache.flink.api.common.accumulators.IntCounter
 import org.apache.flink.api.common.eventtime.WatermarkStrategy
+import org.apache.flink.api.common.functions.RichMapFunction
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.connector.kafka.source.KafkaSource
@@ -39,6 +41,19 @@ object Ingestor extends LazyLogging {
   implicit val typeInfo: Typeclass[StockData] =
     TypeInformation.of(classOf[StockData])
 
+  val runningAvg: RichMapFunction[StockData, StockData] =
+    new RichMapFunction[StockData, StockData] {
+      var avg: Double = 0.0;
+      val count: IntCounter = new IntCounter();
+      override def map(value: StockData): StockData = {
+        // update running average and count
+        avg =
+          (avg * count.getLocalValue + value.volume) / (count.getLocalValue + 1)
+        count.add(1)
+        value.copy(volume = avg)
+      }
+    }
+
   def main(args: Array[String]): Unit = {
     OParser.parse(argParser, args, Config()) match {
       case Some(config) =>
@@ -67,19 +82,9 @@ object Ingestor extends LazyLogging {
             parse(json).extract[StockData]
           }
           .keyBy(_.symbol)
-          .reduce { (a, b) =>
-            StockData(
-              a.symbol,
-              a.datetime,
-              a.open,
-              a.high,
-              a.low,
-              a.close,
-              a.volume + b.volume
-            )
-          }
-        result.print()
+          .map(runningAvg)
 
+        result.print()
         env.execute("Ingestor")
 
       case _ =>
@@ -87,5 +92,4 @@ object Ingestor extends LazyLogging {
         sys.exit(1)
     }
   }
-
 }
