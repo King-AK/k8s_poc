@@ -59,15 +59,15 @@ object Ingestor extends LazyLogging {
           "Kafka Source"
         )
         logger.info("Data source created")
+        // print running sum of volume for each symbol
         val result = data
           .map { json =>
             implicit val formats: Formats =
               DefaultFormats ++ List(TimestampSerializer)
             parse(json).extract[StockData]
           }
-        //          .keyBy(_.symbol)
-        //          .sum("volume")
-        // TODO keyBy symbol and track running averages for price and volume
+          .keyBy(_.symbol)
+          .sum("volume")
         result.print()
 
         env.execute("Ingestor")
