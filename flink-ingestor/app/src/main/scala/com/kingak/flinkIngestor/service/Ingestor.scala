@@ -1,6 +1,7 @@
 package com.kingak.flinkIngestor.service
 
 import com.kingak.flinkIngestor.schemas.StockData
+import com.kingak.flinkIngestor.utils.JSON4SSerializers.TimestampSerializer
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.flink.api.common.eventtime.WatermarkStrategy
 import org.apache.flink.api.common.serialization.SimpleStringSchema
@@ -9,6 +10,8 @@ import org.apache.flink.connector.kafka.source.KafkaSource
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer
 import org.apache.flinkx.api._
 import org.apache.flinkx.api.serializers._
+import org.json4s.jackson.JsonMethods._
+import org.json4s.{DefaultFormats, Formats}
 import scopt.{OParser, OParserBuilder}
 
 object Ingestor extends LazyLogging {
@@ -57,7 +60,11 @@ object Ingestor extends LazyLogging {
         )
         logger.info("Data source created")
         val result = data
-        // TODO reintroduce JSON deserialization
+          .map { json =>
+            implicit val formats: Formats =
+              DefaultFormats ++ List(TimestampSerializer)
+            parse(json).extract[StockData]
+          }
         //          .keyBy(_.symbol)
         //          .sum("volume")
         // TODO keyBy symbol and track running averages for price and volume

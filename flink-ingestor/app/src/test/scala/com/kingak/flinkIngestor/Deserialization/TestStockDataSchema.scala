@@ -13,7 +13,6 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.junit.JUnitRunner
 
-
 @RunWith(classOf[JUnitRunner])
 class TestStockDataSchema extends AnyFunSuite with BeforeAndAfterEach {
 
@@ -65,7 +64,8 @@ class TestStockDataSchema extends AnyFunSuite with BeforeAndAfterEach {
 
     val source = env.fromCollection(jsonByteSeq)
     val result = source.map { json =>
-      implicit val formats: Formats = DefaultFormats ++ List(TimestampSerializer)
+      implicit val formats: Formats =
+        DefaultFormats ++ List(TimestampSerializer)
       parse(json).extract[StockData]
     }
     result.addSink(new StockDataSink)
@@ -75,7 +75,11 @@ class TestStockDataSchema extends AnyFunSuite with BeforeAndAfterEach {
 
     // verify
     assert(StockDataSink.values.get(0).symbol == "AAPL")
-    assert(StockDataSink.values.get(0).datetime == java.sql.Timestamp.valueOf("2024-06-04 19:59:00"))
+    assert(
+      StockDataSink.values.get(0).datetime == java.sql.Timestamp.valueOf(
+        "2024-06-04 19:59:00"
+      )
+    )
 
   }
 

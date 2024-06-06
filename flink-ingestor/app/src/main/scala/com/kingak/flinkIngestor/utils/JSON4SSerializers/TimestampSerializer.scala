@@ -5,8 +5,8 @@ import org.json4s.{CustomSerializer, JString}
 
 import java.sql.Timestamp
 
-
-object TimestampSerializer extends CustomSerializer[Timestamp](_ =>
+object TimestampSerializer
+    extends CustomSerializer[Timestamp](_ =>
       (
         { case JString(str) =>
           Timestamp.valueOf(str)

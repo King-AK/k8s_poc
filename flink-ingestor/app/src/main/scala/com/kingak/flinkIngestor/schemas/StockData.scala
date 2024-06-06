@@ -16,8 +16,10 @@ case class StockData(
 )
 
 object StockDataTypeInfo {
-  implicit val timestampTypeInfo: TypeInformation[Timestamp] = TypeInformation.of(classOf[Timestamp])
-  implicit val stockDataTypeInfo: TypeInformation[StockData] = deriveTypeInformation[StockData]
+  implicit val timestampTypeInfo: TypeInformation[Timestamp] =
+    TypeInformation.of(classOf[Timestamp])
+  implicit val stockDataTypeInfo: TypeInformation[StockData] =
+    deriveTypeInformation[StockData]
 }
 
 //class StockDataSchema extends DeserializationSchema[StockData] {
