@@ -1,17 +1,28 @@
-venv/
-
+# VSCode
 .vscode
+
+# Configs
 .k8s-configs
-*.pyc
-*__pycache__*
-.pytest_cache
 .env
+.helm-config
+
+# Logs
 *.log
 
+# Misc
 exports/
 user/
 volumes/
-
 Grafana/
 
-.helm-config
+# IntelliJ
+.idea/
+
+# Python
+venv/
+*.pyc
+*.pyo
+*.pyd
+*__pycache__*
+.pytest_cache
+.coverage

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: /home/mango/stuff/bin/kompose -f docker-compose.yml convert -o k8s/
+    kompose.version: 1.34.0 (cbf2835db)
+  labels:
+    io.kompose.service: flink-ingestor-jobmanager
+  name: flink-ingestor-jobmanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: flink-ingestor-jobmanager
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: /home/mango/stuff/bin/kompose -f docker-compose.yml convert -o k8s/
+        kompose.version: 1.34.0 (cbf2835db)
+      labels:
+        io.kompose.service: flink-ingestor-jobmanager
+    spec:
+      containers:
+        - args:
+            - standalone-job
+            - --jars
+            - /opt/flink/usrlib/artifacts/flink-ingestor-0.0.1.jar
+            - --job-classname
+            - com.kingak.flinkIngestor.service.Ingestor
+            - -k
+            - kafka:9092
+            - -t
+            - ""
+          env:
+            - name: FLINK_PROPERTIES
+              value: |2
+                jobmanager.rpc.address: flink-ingestor-jobmanager
+                parallelism.default: 2
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+            - name: KAFKA_TOPIC
+          image: kingak/flink-app:latest
+          name: flink-ingestor-jobmanager
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+            - containerPort: 6123
+              protocol: TCP
+      restartPolicy: Always
