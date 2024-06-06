@@ -134,7 +134,17 @@ class TestStockDataSchema extends AnyFunSuite with BeforeAndAfterEach {
     val source: DataStream[StockData] = env.fromCollection(stockDataObjects)
     val result = source
       .keyBy(_.symbol)
-      .sum("volume")
+      .reduce { (a, b) =>
+        StockData(
+          a.symbol,
+          a.datetime,
+          a.open,
+          a.high,
+          a.low,
+          a.close,
+          a.volume + b.volume
+        )
+      }
     result.addSink(new StockDataSink)
 
     // execute

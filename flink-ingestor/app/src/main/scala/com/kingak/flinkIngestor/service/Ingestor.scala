@@ -67,7 +67,17 @@ object Ingestor extends LazyLogging {
             parse(json).extract[StockData]
           }
           .keyBy(_.symbol)
-          .sum("volume")
+          .reduce { (a, b) =>
+            StockData(
+              a.symbol,
+              a.datetime,
+              a.open,
+              a.high,
+              a.low,
+              a.close,
+              a.volume + b.volume
+            )
+          }
         result.print()
 
         env.execute("Ingestor")
