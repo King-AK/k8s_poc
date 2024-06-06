@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: /home/mango/stuff/bin/kompose -f docker-compose.yml convert -o k8s/
+    kompose.version: 1.34.0 (cbf2835db)
+  labels:
+    io.kompose.service: kafka
+  name: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: kafka
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: /home/mango/stuff/bin/kompose -f docker-compose.yml convert -o k8s/
+        kompose.version: 1.34.0 (cbf2835db)
+      labels:
+        io.kompose.service: kafka
+    spec:
+      containers:
+        - env:
+            - name: ALLOW_PLAINTEXT_LISTENER
+              value: "yes"
+            - name: BITNAMI_DEBUG
+              value: "TRUE"
+            - name: KAFKA_CFG_ADVERTISED_LISTENERS
+              value: CLIENT://kafka:9092,EXTERNAL://localhost:9093
+            - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
+              value: "true"
+            - name: KAFKA_CFG_LISTENERS
+              value: CLIENT://:9092,EXTERNAL://:9093
+            - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+              value: CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+            - name: KAFKA_CFG_ZOOKEEPER_CONNECT
+              value: zookeeper:2181
+            - name: KAFKA_ENABLE_KRAFT
+              value: "no"
+            - name: KAFKA_INTER_BROKER_LISTENER_NAME
+              value: CLIENT
+          image: docker.io/bitnami/kafka:3.2
+          name: kafka
+          ports:
+            - containerPort: 9092
+              protocol: TCP
+            - containerPort: 9093
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /bitnami
+              name: kafka-data
+      restartPolicy: Always
+      volumes:
+        - name: kafka-data
+          persistentVolumeClaim:
+            claimName: kafka-data
